@@ -114,6 +114,54 @@ def main():
         else:
             print("Invalid choice, try again.")
 
+# Q6: Revenue by product category
+def q6_revenue_by_category(df):
+    print("Running Q6: Revenue by Product Category...")
+    result = df.groupBy("category") \
+               .agg(F.sum("total_amount").alias("category_revenue")) \
+               .orderBy(F.desc("category_revenue"))
+    result.show()
+
+# Q7: Quantity sold by product category
+def q7_quantity_by_category(df):
+    print("Running Q7: Quantity Sold by Category...")
+    result = df.groupBy("category") \
+               .agg(F.sum("quantity").alias("total_quantity")) \
+               .orderBy(F.desc("total_quantity"))
+    result.show()
+
+# Q8: Repeat vs one-time customers
+def q8_repeat_vs_one_time(df):
+    print("Running Q8: Repeat vs One-Time Customers...")
+    customer_order_counts = df.groupBy("customer_id") \
+                              .agg(F.countDistinct("order_id").alias("orders"))
+    
+    result = customer_order_counts.withColumn("customer_type", 
+               F.when(F.col("orders") > 1, "Repeat").otherwise("One-Time")) \
+               .groupBy("customer_type") \
+               .agg(F.count("*").alias("num_customers"))
+    
+    result.show()
+
+# Q9: Orders and revenue by location
+def q9_orders_revenue_by_location(df):
+    print("Running Q9: Orders and Revenue by Location...")
+    result = df.groupBy("location") \
+               .agg(
+                   F.countDistinct("order_id").alias("total_orders"),
+                   F.sum("total_amount").alias("total_revenue")
+               ).orderBy(F.desc("total_revenue"))
+    result.show()
+
+# Q10: Daily sales trend
+def q10_daily_sales(df):
+    print("Running Q10: Daily Sales Trend...")
+    result = df.groupBy("order_date") \
+               .agg(F.sum("total_amount").alias("daily_revenue")) \
+               .orderBy("order_date")
+    result.show(30)  # Display the first 30 days of sales
+
+
 # ---------------------------------------------
 # Entry point of the program
 # ---------------------------------------------
